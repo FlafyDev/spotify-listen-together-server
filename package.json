@@ -7,7 +7,8 @@
   },
   "main": "dist/server.js",
   "scripts": {
-    "start": "nodemon src/server.ts"
+    "start": "tsc && node dist/server.js",
+    "start-dev": "nodemon src/server.ts"
   },
   "devDependencies": {
     "nodemon": "^2.0.15",
