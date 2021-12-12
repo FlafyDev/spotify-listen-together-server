@@ -1,4 +1,5 @@
 import { Server, Socket } from 'socket.io';
+import { createServer } from 'http'
 import ClientInfo from './clientInfo';
 import "dotenv-defaults/config"
 
@@ -7,7 +8,8 @@ import "dotenv-defaults/config"
 const HOST_PASSWORD = process.env.HOST_PASSWORD
 const DELAY = parseInt(process.env.DELAY!)
 
-const io = new Server(8080, {
+const httpServer = createServer();
+const io = new Server(httpServer, {
   cors: {
     origin: '*'
   }
@@ -64,4 +66,5 @@ io.on("connection", (socket: Socket) => {
   })
 })
 
+httpServer.listen(parseInt(process.env.PORT!))
 console.log("Server is running.")
