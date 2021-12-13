@@ -1,3 +1,5 @@
 export default class ClientInfo {
-  constructor(public name: string, public isHost = false) {}
+  public latency = 0
+  public name = "Unnamed"
+  public isHost = false
 }
