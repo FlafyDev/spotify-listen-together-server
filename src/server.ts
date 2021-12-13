@@ -72,6 +72,7 @@ io.on("connection", (socket: Socket) => {
     let minLatency = MAXDELAY
     listeners.forEach(socketId => {
       let info = clientsInfo.get(socketId)!
+      console.log(`Latency for ${info.name} is ${info.latency}`)
       maxLatency = Math.max(info.latency, maxLatency)
       minLatency = Math.min(info.latency, minLatency)
     })
