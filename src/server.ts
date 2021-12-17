@@ -1,14 +1,9 @@
 import { Server, Socket } from 'socket.io';
-import { createServer } from 'http'
 import ClientInfo from './clientInfo';
-import "dotenv-defaults/config"
 import Player from './player';
+import config from './config'
 
 // track uri example: "spotify:track:5Hyr47BBGpvOfcykSCcaw9"
-
-const HOST_PASSWORD = process.env.HOST_PASSWORD
-const MAXDELAY = parseInt(process.env.MAXDELAY!)
-const PORT = parseInt(process.env.PORT!)
 
 const io = new Server({
   cors: {
@@ -20,10 +15,10 @@ let clientsInfo = new Map<string, ClientInfo>()
 const player = new Player(emitToListeners, clientsInfo)
 
 function emitToListeners(ev: string, ...args: any) {
-  console.log("sending EVENT: " + ev + "    :    " + args)
+  console.log(`Sending ${ev}: ${args}`)
   let listeners = io.sockets.adapter.rooms.get("listeners")!
   let maxLatency = 0
-  let minLatency = MAXDELAY
+  let minLatency = config.maxDelay
   listeners.forEach(socketId => {
     let info = clientsInfo.get(socketId)!
     // console.log(`Latency for ${info.name} is ${info.latency}`)
@@ -51,12 +46,12 @@ io.on("connection", (socket: Socket) => {
 
   socket.conn.on('packet', function (packet) {
     if (packet.type === 'pong') {
-      info.latency = Math.min((Date.now() - lastPing)/2, MAXDELAY)
+      info.latency = Math.min((Date.now() - lastPing)/2, config.maxDelay)
     }
   });
 
   socket.onAny((ev: string, ...args: any) => {
-    console.log(`got ${ev}(${info.isHost}): ${args}`)
+    console.log(`Receiving ${ev}(host=${info.isHost}): ${args}`)
   })
   
   socket.conn.on('packetCreate', function (packet) {
@@ -71,7 +66,7 @@ io.on("connection", (socket: Socket) => {
   })
 
   socket.on("requestHost", (password: string, callback: (permitted: boolean) => void) => {
-    if (info?.isHost || (info !== undefined && password === HOST_PASSWORD)) {
+    if (info?.isHost || (info !== undefined && password === config.hostPassword)) {
       info.isHost = true
       callback(true)
     } else {
@@ -85,4 +80,4 @@ io.on("connection", (socket: Socket) => {
   })
 })
 
-io.listen(PORT)
+io.listen(config.port)

@@ -1,5 +1,6 @@
 import { Socket } from "socket.io"
 import ClientInfo from "./clientInfo"
+import config from './config'
 
 export default class Player {
   public currentTrackUri = ""
@@ -33,7 +34,7 @@ export default class Player {
         console.log("Timed out for loading track!")
         this.loadingTrack = null
         this.updateSong(false, 0)
-      }, 8000)
+      }, config.maxDelay)
     }
   }
 
