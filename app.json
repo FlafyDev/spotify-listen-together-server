@@ -10,7 +10,7 @@
       "required": false
     },
     "MAX_DELAY": {
-      "description": "Maximum milliseconds the server is willing to wait after an action to all the listeners.",
+      "description": "Most milliseconds the server will be willing to wait for all the listeners after an action.",
       "value": "5000",
       "required": false
     }
