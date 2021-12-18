@@ -6,11 +6,13 @@
   "env": {
     "HOST_PASSWORD": {
       "description": "This password is required for a listener to receive host access.",
-      "value": "1234"
+      "value": "1234",
+      "required": false
     },
     "MAX_DELAY": {
       "description": "Maximum milliseconds the server is willing to wait after an action to all the listeners.",
-      "value": "5000"
+      "value": "5000",
+      "required": false
     }
   }
 }
