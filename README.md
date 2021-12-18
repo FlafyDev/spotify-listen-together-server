@@ -4,4 +4,6 @@ To understand what this is, visit [Spotify Listen Together](https://github.com/F
 ### Creating a server
 The server must be hosted somewhere.
 
-To host on Heroku: [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+To host with Heroku:
+
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
