@@ -2,7 +2,7 @@ import { Server, Socket } from 'socket.io';
 import ClientInfo from './clientInfo';
 import Player from './player';
 import config from './config'
-
+import ClientVersionValidator from './clientVersionValidator';
 // track uri example: "spotify:track:5Hyr47BBGpvOfcykSCcaw9"
 
 const io = new Server({
@@ -13,6 +13,7 @@ const io = new Server({
 })
 let clientsInfo = new Map<string, ClientInfo>()
 const player = new Player(emitToListeners, clientsInfo)
+const clientVersionValidator = new ClientVersionValidator()
 
 function emitToListeners(ev: string, ...args: any) {
   console.log(`Sending ${ev}: ${args}`)
@@ -59,10 +60,19 @@ io.on("connection", (socket: Socket) => {
       lastPing = Date.now()
   });
 
-  socket.on("login", (name: string) => {
-    info.name = name
-    info.loggedIn = true;
-    socket.join("listeners")
+  socket.on("login", (name: string, clientVersion?: string, badVersion?: (requirements: string) => void) => {
+    if (clientVersionValidator.validate(clientVersion)) {
+      info.name = name
+      info.loggedIn = true;
+      socket.join("listeners")
+    } else {
+      if (badVersion != null)
+        badVersion(clientVersionValidator.requirements)
+        
+      setTimeout(() => {
+        socket.disconnect()
+      }, 3000)
+    }
   })
 
   socket.on("requestHost", (password: string, callback: (permitted: boolean) => void) => {
