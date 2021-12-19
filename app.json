@@ -5,12 +5,12 @@
   "keywords": ["spotify", "spicetify", "listen together"],
   "env": {
     "HOST_PASSWORD": {
-      "description": "This password is required for a listener to receive host access.",
+      "description": "The password a listener must have to get host access.",
       "value": "1234",
       "required": false
     },
     "MAX_DELAY": {
-      "description": "Most milliseconds the server will be willing to wait for all the listeners after an action.",
+      "description": "Maximum time in milliseconds the server will be willing to wait for all the listeners after an action.",
       "value": "5000",
       "required": false
     }
