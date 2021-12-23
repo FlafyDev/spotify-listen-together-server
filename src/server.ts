@@ -75,13 +75,24 @@ io.on("connection", (socket: Socket) => {
     }
   })
 
-  socket.on("requestHost", (password: string, callback: (permitted: boolean) => void) => {
-    if (info?.isHost || (info !== undefined && password === config.hostPassword)) {
-      info.isHost = true
-      callback(true)
+  socket.on("requestHost", (password: string) => {
+    if (password === config.hostPassword) {
+      if ([...clientsInfo.values()].every((info: ClientInfo) => !info.isHost)) {
+        info.isHost = true
+        socket.emit("isHost", true)
+      } else {
+        console.log("There is already an host")
+        socket.emit("showMessage", "There is already an host.")
+      }
     } else {
-      callback(false)
+      info.isHost = false
+      socket.emit("isHost", false)
     }
+  })
+
+  socket.on("cancelHost", () => {
+    info.isHost = false
+    socket.emit("isHost", false)
   })
 
   socket.on("disconnecting", (reason) => {

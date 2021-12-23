@@ -10,7 +10,7 @@ export default class Player {
   constructor(private emitToListeners: (ev: string, ...args: any) => void, private clientsInfo: Map<string, ClientInfo>) {}
 
   static isTrackValid(trackUri: string) {
-    return trackUri.includes("spotify:track:")
+    return trackUri.includes("spotify:track:") || trackUri.includes("spotify:episode:")
   }
 
   isTrackLoaded() {
@@ -60,6 +60,8 @@ export default class Player {
         setTimeout(() => {
           this.updateSong(false, 0)
         }, 1000)
+      } else if (info.isHost) {
+        this.changeSong(trackUri)
       }
     })
   }

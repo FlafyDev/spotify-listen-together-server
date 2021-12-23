@@ -1,6 +1,6 @@
 {
   "name": "spotify-listen-together-server",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "dependencies": {
     "@types/semver": "^7.3.9",
     "dotenv-defaults": "^3.0.0",
