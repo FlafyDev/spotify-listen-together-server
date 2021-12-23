@@ -1,0 +1,26 @@
+.song {
+  height: 100px;
+  display: flex;
+  background-color: #181818;
+  width: 500px;
+  align-items: center;
+  padding: 25px;
+  border: 3px #282828 ;
+  border-style: dashed;
+  border-radius: 30px;
+}
+
+.image {
+  display: inline;
+  object-fit: cover;
+  width: 100px;
+  height: 100px;
+}
+
+.text {
+  padding: 25px;
+  position: relative;
+  display: inline;
+  font-size: 30px;
+  overflow: hidden;
+}

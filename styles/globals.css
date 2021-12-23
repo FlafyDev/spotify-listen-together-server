@@ -1,0 +1,24 @@
+@font-face {
+  font-family: 'Gotham';
+  src: url('/fonts/GothamBold.ttf');
+  font-weight: 700;
+  font-style: normal;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: go;
+}
+
+body * {
+  font-family: 'Gotham';
+  font-weight: 700;
+  color: white;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
