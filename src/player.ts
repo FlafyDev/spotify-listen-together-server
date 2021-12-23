@@ -6,7 +6,9 @@ export default class Player {
   public currentTrackUri = ""
   public isPlaying = false
   public loadingTrack: NodeJS.Timeout | null = null
-
+  public currentSongName = ""
+  public currentSongImage = ""
+  
   constructor(private emitToListeners: (ev: string, ...args: any) => void, private clientsInfo: Map<string, ClientInfo>) {}
 
   static isTrackValid(trackUri: string) {
@@ -52,15 +54,17 @@ export default class Player {
       }
     })
 
-    socket.on("changedSong", (trackUri: string) => {
+    socket.on("changedSong", (trackUri: string, songName?: string, songImage?: string) => {
       info.currentTrackUri = trackUri
-      if (this.loadingTrack !== null && Object.values(this.clientsInfo).every((client: ClientInfo) => client.currentTrackUri === this.currentTrackUri)) {
+      if (this.loadingTrack !== null && Object.values(this.clientsInfo).every((client: ClientInfo) => !client.loggedIn || client.currentTrackUri === this.currentTrackUri)) {
         clearTimeout(this.loadingTrack)
         this.loadingTrack = null
         setTimeout(() => {
           this.updateSong(false, 0)
         }, 1000)
       } else if (info.isHost) {
+        if (songName) this.currentSongName = songName
+        if (songImage) this.currentSongImage = songImage
         this.changeSong(trackUri)
       }
     })

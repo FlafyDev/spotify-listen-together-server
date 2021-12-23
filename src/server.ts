@@ -60,6 +60,7 @@ io.on("connection", (socket: Socket) => {
       lastPing = Date.now()
   });
 
+  // TODO: replace `badVersion` callback function with emit "ShowMessage" 
   socket.on("login", (name: string, clientVersion?: string, badVersion?: (requirements: string) => void) => {
     if (clientVersionValidator.validate(clientVersion)) {
       info.name = name
@@ -77,7 +78,7 @@ io.on("connection", (socket: Socket) => {
 
   socket.on("requestHost", (password: string) => {
     if (password === config.hostPassword) {
-      if ([...clientsInfo.values()].every((info: ClientInfo) => !info.isHost)) {
+      if ([...clientsInfo.values()].every((info: ClientInfo) => !info.loggedIn || !info.isHost)) {
         info.isHost = true
         socket.emit("isHost", true)
       } else {
@@ -93,6 +94,14 @@ io.on("connection", (socket: Socket) => {
   socket.on("cancelHost", () => {
     info.isHost = false
     socket.emit("isHost", false)
+  })
+
+  socket.on("getCurrentSong", (sendClients: (clients: string[]) => void) => {
+    sendClients([...clientsInfo.values()].filter((info: ClientInfo) => info.loggedIn).map((info: ClientInfo) => info.name))
+  })
+
+  socket.on("getCurrentSong", (sendSong: (name: string, image: string) => void) => {
+    sendSong(player.currentSongName, player.currentSongImage)
   })
 
   socket.on("disconnecting", (reason) => {
