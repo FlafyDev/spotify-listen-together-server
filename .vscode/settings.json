@@ -1,0 +1,23 @@
+{
+  "files.exclude": {
+    "node_modules": true,
+    ".pnp": true,
+    "**/.pnp.js": true,
+    "coverage": true,
+    ".next/": true,
+    "out/": true,
+    "build": true,
+    "**/.DS_Store": true,
+    "**/*.pem": true,
+    "**/npm-debug.log*": true,
+    "**/yarn-debug.log*": true,
+    "**/yarn-error.log*": true,
+    "**/.env.local": true,
+    "**/.env.development.local": true,
+    "**/.env.test.local": true,
+    "**/.env.production.local": true,
+    "**/.vercel": true,
+    "**/*.tsbuildinfo": true,
+    "**/dist": true
+  }
+}

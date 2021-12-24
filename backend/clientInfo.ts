@@ -1,3 +1,5 @@
+import { Socket } from "socket.io"
+
 export default class ClientInfo {
   public latency = 0
   public name = "Unnamed"
@@ -5,7 +7,5 @@ export default class ClientInfo {
   public loggedIn = false
   public currentTrackUri = ""
 
-  debugString() {
-    return `${this.name}: Host=${this.isHost} Track=${this.currentTrackUri}`
-  }
+  constructor(public socket: Socket) {}
 }

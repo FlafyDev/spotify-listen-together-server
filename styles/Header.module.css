@@ -1,0 +1,42 @@
+
+
+.mainTextContainer {
+  height: 30vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.mainText {
+  color: #1db954;
+  font-size: 7vw;
+}
+
+.specialText {
+  background: #1db954;
+  background: linear-gradient(rgba(29,185,84,1) 0%, rgba(29,185,181,1) 41%, rgb(185, 39, 185) 80%);
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 8vw;
+}
+
+@media only screen and (max-width: 1000px) {
+  .mainText {
+    font-size: 10vw;
+  }
+  .specialText {
+    display: block;
+    font-size: 11vw;
+  }
+}
+
+@media only screen and (max-width: 500px) {
+  .mainText {
+    font-size: 14vw;
+  }
+  .specialText {
+    display: block;
+    font-size: 12vw;
+  }
+}

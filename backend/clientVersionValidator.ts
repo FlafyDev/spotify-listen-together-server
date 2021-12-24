@@ -1,9 +1,8 @@
 import semver from 'semver';
+import config from '../config';
 
 export default class ClientVersionValidator {
-  requirements = "0.3.0"
-
   validate(version?: string): boolean {
-    return (!!version) && semver.satisfies(version, this.requirements)
+    return (!!version) && semver.satisfies(version, config.clientVersionRequirements)
   }
 }

@@ -1,0 +1,33 @@
+@font-face {
+  font-family: 'Gotham';
+  src: url('/fonts/GothamBold.ttf');
+  font-weight: 700;
+  font-style: normal;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: go;
+}
+
+body * {
+  font-family: 'Gotham';
+  font-weight: 700;
+  color: white;
+}
+
+a {
+  color: rgb(157, 255, 165);
+}
+.main {
+  background-color: #191414;
+  width: 100vw;
+  height: 100vh;
+  overflow: scroll;
+}
+
+.main::-webkit-scrollbar {
+  display: none;
+}

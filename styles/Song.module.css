@@ -1,0 +1,47 @@
+.song {
+  height: 100px;
+  display: flex;
+  max-width: 500px;
+  width: 70vw;
+  align-items: center;
+  overflow: hidden;
+}
+
+.image {
+  display: inline;
+  object-fit: cover;
+  width: 100px;
+  height: 100px;
+}
+
+.text {
+  overflow: hidden;
+  padding: 25px;
+  position: relative;
+  display: inline;
+  font-size: 30px;
+}
+
+.playing {
+  color: #1db954;
+}
+
+.playingImg {
+  margin-left: auto;
+}
+
+.none {
+  display: none;
+}
+
+@media only screen and (max-width: 600px) {
+  .text {
+    font-size:20px;
+  }
+}
+
+@media only screen and (max-width: 400px) {
+  .text {
+    font-size:15px;
+  }
+}
