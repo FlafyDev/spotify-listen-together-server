@@ -14,11 +14,11 @@
     "outDir": "dist",
     "jsx": "preserve",
     "allowJs": true,
-    "noEmit": true,
     "incremental": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "noEmit": false
   },
   "include": [
     "next-env.d.ts",
