@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { Router, useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { io } from 'socket.io-client'
-import SongInfo from '../backend/web-shared/songInfo'
+import SongInfo from '../../backend/web-shared/songInfo'
 import ClientList from '../components/clientList'
 import Header from '../components/header'
 import Song from '../components/song'
@@ -33,7 +33,7 @@ const Index: NextPage = () => {
       <br/>
       <Song song={songInfo}></Song>
       <br/><br/><br/>
-      <div className={styles.header}>Who's listening?</div>
+      <div className={styles.header}>Who&apos;s listening?</div>
       <br/>
       <ClientList clients={clients}></ClientList>
       <br/><br/><br/>

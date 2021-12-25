@@ -1,5 +1,5 @@
 import { NextPage } from "next";
-import config from "../config";
+import config from "../../config";
 import styles from '../styles/Index.module.css'
 import stylesInst from '../styles/Instructions.module.css'
 import spotStyles from '../styles/Spot.module.css'
@@ -20,7 +20,7 @@ const Instructions: NextPage = () => {
         <br />
         <div className={styles.text+" "+styles.left}>
           1. Press WIN + R<br/>
-          2. Type "Powershell" and press ENTER<br/>
+          2. Type &quot;Powershell&quot; and press ENTER<br/>
           3. Paste:
         </div>
         <br />
@@ -43,8 +43,8 @@ const Instructions: NextPage = () => {
         <div className={styles.text+" "+styles.left}>
           1. Download and install <a href="https://spicetify.app/docs/getting-started/installation">Spicetify</a>.<br/>
           2. Download <a href={listenTogetherURL}>listenTogether.js</a>.<br/>
-          3. Paste "listenTogether.js" in ".../.spicetify/Extensions" (find the folder ".spicetify" by typing "spicetify -c" in Powershell).<br/>
-          4. Run "spicetify config extensions listenTogether.js" and "spicetify backup apply".<br/>
+          3. Paste &quot;listenTogether.js&quot; in &quot;.../.spicetify/Extensions&quot; (find the folder &quot;.spicetify&quot; by typing &quot;spicetify -c&quot; in Powershell).<br/>
+          4. Run &quot;spicetify config extensions listenTogether.js&quot; and &quot;spicetify backup apply&quot;.<br/>
         </div>
       </div>
     </div>

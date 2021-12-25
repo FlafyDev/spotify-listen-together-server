@@ -1,10 +1,13 @@
 {
   "name": "spotify-listen-together-server",
   "version": "0.3.0",
+  "main": "index.js",
   "scripts": {
-    "start-dev": "nodemon server.ts",
-    "start": "node dist/server.js",
-    "build": "tsc",
+    "start-dev": "nodemon --exec \"ts-node --project tsconfig.server.json backend/index.ts\"",
+    "start": "set NODE_ENV=production && node dist/backend/index.js",
+    "build:server": "tsc --project tsconfig.server.json",
+    "build:next": "next build",
+    "build": "yarn run build:next && yarn run build:server",
     "postinstall": "yarn run build"
   },
   "dependencies": {
