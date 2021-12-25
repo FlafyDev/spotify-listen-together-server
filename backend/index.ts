@@ -22,7 +22,13 @@ app.prepare().then(() => {
     pingInterval: 1000
   })
 
-  server.use(express.static(path.join(__dirname, '/public')))
+  // Sorry I don't know another way
+  let publicFolder = path.join(__dirname, '/public')
+  let distPos = publicFolder.lastIndexOf("dist");
+  if (distPos != -1)
+    publicFolder = publicFolder.substring(0, distPos) + publicFolder.substring(distPos+4, publicFolder.length);
+
+  server.use(express.static(publicFolder))
 
   new Backend(io)
 
