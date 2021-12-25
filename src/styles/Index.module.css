@@ -41,3 +41,39 @@
 .code::-webkit-scrollbar {
   display: none;
 }
+
+.instruction2Container {
+  position: relative;
+}
+
+.instructionsContainer img {
+  width: 397px;
+}
+
+.textbox {
+  position: absolute;
+  outline: none;
+  color: black;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 8.25;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  
+  top: 99px;
+  left: 41px;
+  height: 17px;
+  width: 307px;
+}
+
+@media only screen and (max-width: 450px) { 
+  .instructionsContainer img {
+    width: 300px;
+  }
+
+  .textbox {
+    top: 74px;
+    left: 31px;
+    height: 12px;
+    width: 231px;
+  }
+}

@@ -1,4 +1,5 @@
 import { NextPage } from "next";
+import Image from 'next/image'
 import config from "../../config";
 import styles from '../styles/Index.module.css'
 import stylesInst from '../styles/Instructions.module.css'
@@ -38,14 +39,33 @@ const Instructions: NextPage = () => {
           {windowsInstallCMD}
         </div>
         <br /><br />
-        <div className={styles.header+" "+styles.left}>Manual install</div>
+        <br /><br />
+        <div className={styles.header+" "+styles.left}>OR: Manual install</div>
         <br />
         <div className={styles.text+" "+styles.left}>
-          1. Download and install <a href="https://spicetify.app/docs/getting-started/installation">Spicetify</a>.<br/>
-          2. Download <a href={listenTogetherURL}>listenTogether.js</a>.<br/>
-          3. Paste &quot;listenTogether.js&quot; in &quot;.../.spicetify/Extensions&quot; (find the folder &quot;.spicetify&quot; by typing &quot;spicetify -c&quot; in Powershell).<br/>
-          4. Run &quot;spicetify config extensions listenTogether.js&quot; and &quot;spicetify backup apply&quot;.<br/>
+          1. Download and install <a href="https://spicetify.app/docs/getting-started/installation">Spicetify</a>.<br/><br/>
+          2. Download <a href={listenTogetherURL}>listenTogether.js</a>.<br/><br/>
+          3. Paste &quot;listenTogether.js&quot; in &quot;.../.spicetify/Extensions&quot; (find the folder &quot;.spicetify&quot; by typing &quot;spicetify -c&quot; in Powershell).<br/><br/>
+          4. Run &quot;spicetify config extensions listenTogether.js&quot; and &quot;spicetify backup apply&quot;.<br/><br/>
         </div>
+        <br/><br/>
+        <br/><br/>
+        <div className={styles.header+" "+styles.left}>After installation</div>
+        <br/>
+        <div className={styles.text+" "+styles.left+" "+styles.instructionsContainer}>
+          <div>
+            1. Listen Together &gt; Join a server<br/>
+            <img src="images/Instruction1.png"></img><br/><br/>
+          </div>
+          <div>
+            2. Enter the URL<br/>
+            <div className={styles.instruction2Container}>
+              <img src="/images/Instruction2.png"></img>
+              <input className={styles.textbox} value={typeof location !== 'undefined' ? location.protocol + '//' + location.host : ""} type="text" readOnly={true}/>
+            </div>
+          </div>
+        </div>
+        <br/><br/><br/><br/><br/><br/><br/><br/>
       </div>
     </div>
   )
