@@ -3,7 +3,7 @@
   "version": "0.3.0",
   "main": "index.js",
   "scripts": {
-    "start-dev": "nodemon --exec \"ts-node --project tsconfig.server.json backend/index.ts\"",
+    "start-dev": "nodemon --exec \"ts-node --project tsconfig.server.json backend/index.ts\" --watch \"src/**\" --watch \"backend/**\" -e ts,tsx",
     "start": "set NODE_ENV=production && node dist/backend/index.js",
     "build:server": "tsc --project tsconfig.server.json",
     "build:next": "next build",

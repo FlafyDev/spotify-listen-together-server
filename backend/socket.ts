@@ -22,7 +22,6 @@ export default class SocketServer {
   }
 
   emitToListeners(ev: string, ...args: any) {
-    console.log(`Sending ${ev}: ${args}`)
     let listeners = this.getListeners()
     let maxLatency = 0
     let minLatency = config.maxDelay
@@ -52,6 +51,7 @@ export default class SocketServer {
           info.latency = Math.min((Date.now() - lastPing)/2, config.maxDelay)
         }
       });
+      
     
       socket.onAny((ev: string, ...args: any) => {
         console.log(`Receiving ${ev}(host=${info.isHost}): ${args}`)
@@ -76,6 +76,11 @@ export default class SocketServer {
           }, 3000)
         }
       })
+
+      socket.on("watchingAD", (watcingAD: boolean) => {
+        info.watchingAD = watcingAD;
+        this.player.checkADs();
+      })
     
       socket.on("requestHost", (password: string) => {
         if (password === config.hostPassword) {
@@ -84,11 +89,12 @@ export default class SocketServer {
             socket.emit("isHost", true)
           } else {
             console.log("There is already an host")
-            socket.emit("showMessage", "There is already an host.")
+            socket.emit("showMessage", "There is already an host.", true)
           }
         } else {
           info.isHost = false
           socket.emit("isHost", false)
+          socket.emit("showMessage", "Incorrect password.", true)
         }
       })
     
@@ -101,6 +107,10 @@ export default class SocketServer {
         sendClients(this.getListeners().map((info: ClientInfo) => info.name))
       })
     
+      socket.on("requestSyncSong", () => {
+        this.player?.onRequestSyncSong(info)
+      })
+
       socket.on("requestUpdateSong", (pause: boolean, milliseconds: number) => {
         this.player?.onRequestUpdateSong(info, pause, milliseconds)
       })
