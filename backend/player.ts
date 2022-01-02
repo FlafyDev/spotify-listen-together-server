@@ -5,7 +5,7 @@ import SocketServer from "./socket"
 import SongInfo from "./web-shared/songInfo"
 
 export default class Player {
-  public currentTrackUri = ""
+  public trackUri = ""
   public paused = true
   public loadingTrack: NodeJS.Timeout | null = null
   public milliseconds = 0
@@ -15,20 +15,24 @@ export default class Player {
   
   constructor(public socketServer: SocketServer) { }
 
-  static isTrackValid(trackUri: string) {
-    return trackUri.includes("spotify:track:") || trackUri.includes("spotify:episode:")
+  static isTrackListenable(trackUri: string) {
+    return trackUri.startsWith("spotify:track:") || trackUri.startsWith("spotify:episode:")
   }
 
-  isTrackLoaded() {
-    return Player.isTrackValid(this.currentTrackUri) && (this.loadingTrack === null)
+  static isTrackAd(trackUri: string) {
+    return trackUri.startsWith("spotify:ad:")
   }
 
-  getSongTime() {
+  // Returns elapsed duration in milliseconds
+  getTrackProgress() {
     return this.paused ? this.milliseconds : this.milliseconds+(Date.now()-this.millisecondsLastUpdate)
   }
 
-  updateSong(pause: boolean, milliseconds: number, force?: boolean) {
-    if ((this.isTrackLoaded() && !this.locked) || force) {
+  /*
+    Commands
+  */
+  updateSong(pause: boolean, milliseconds: number) {
+    if (this.loadingTrack === null && Player.isTrackListenable(this.trackUri)) {
       this.paused = pause
       this.milliseconds = milliseconds
       this.millisecondsLastUpdate = Date.now()
@@ -39,86 +43,117 @@ export default class Player {
     return false
   }
 
-  checkADs() {
-    this.lock(this.socketServer.getListeners().some(info => info.watchingAD))
-  }
-
-  lock(lock: boolean) {
-    console.log("LOCKING: " + lock)
-    if (this.locked != lock) {
-      if (lock) {
-        this.updateSong(true, 0, true)
-        this.locked = lock
-      } else {
-        this.locked = lock
-        this.changeSong(this.currentTrackUri)
-      }
-    }
-  }
-
   changeSong(trackUri: string) {
-    if (Player.isTrackValid(trackUri) && !this.locked) {
+    if (Player.isTrackListenable(trackUri) && this.loadingTrack === null) {
       this.milliseconds = 0
-      this.currentTrackUri = trackUri
+      this.trackUri = trackUri
       this.socketServer.emitToListeners("changeSong", trackUri)
-      clearTimeout(this.loadingTrack)
-      this.loadingTrack = null
       this.loadingTrack = setTimeout(() => {
         console.log("Timed out for loading track!")
-        this.loadingTrack = null
-        this.updateSong(false, 0)
+        this.trackLoaded()
       }, config.maxDelay)
     }
   }
 
-  onRequestSyncSong(info: ClientInfo) {
-    if (Player.isTrackValid(this.currentTrackUri))
-      info.socket.emit("syncSong", this.currentTrackUri, this.paused, this.getSongTime())
-  }
-
-  onRequestUpdateSong(info: ClientInfo, pause: boolean, milliseconds: number) {
-    if (info.isHost) {
+  /*
+    Requests
+  */
+  requestUpdateSong(info: ClientInfo | undefined, pause: boolean, milliseconds: number) {
+    if (info === undefined || info?.isHost) {
       if (this.locked) {
-        info.socket.emit("showMessage", "Listen together is currently locked!", true)
+        info?.socket.emit("showMessage", "Listen together is currently locked!", true)
       } else {
         this.updateSong(pause, milliseconds)
       }
     }
   }
 
-  onRequestChangeSong(info: ClientInfo, trackUri: string) {
-    if (info.isHost) {
+  /*
+    Updates
+  */
+  listenerChangedSong(info: ClientInfo, newTrackUri: string, songName?: string, songImage?: string) {
+    info.trackUri = newTrackUri
+    if (info.isHost && info.trackUri !== this.trackUri) {
       if (this.locked) {
         info.socket.emit("showMessage", "Listen together is currently locked!", true)
       } else {
-        this.changeSong(trackUri)
+        this.updateSongInfo(songName, songImage)
+        this.changeSong(info.trackUri)
+      }
+    }
+    this.checkListenerHasAD()
+    if (!this.locked) {
+      if (this.loadingTrack !== null) {
+        this.checkTrackLoaded()
+      } else {
+        this.checkUnsynchronizedListeners()
       }
     }
   }
 
-  onClientChangedSong(info: ClientInfo, newTrackUri: string, songName?: string, songImage?: string) {
-    let changed = info.currentTrackUri != newTrackUri
-    info.currentTrackUri = newTrackUri
-    if (info.isHost && changed) {
-      this.updateSongInfo(songName, songImage)
-      this.changeSong(newTrackUri)
-    }
-    else if (this.loadingTrack !== null && [...this.socketServer.clientsInfo.values()].every((client: ClientInfo) => !client.loggedIn || client.currentTrackUri === this.currentTrackUri)) {
-      clearTimeout(this.loadingTrack)
-      this.loadingTrack = null
-      setTimeout(() => {
-        this.updateSong(false, 0)
-      }, 1000)
+  listenerLoggedIn(info: ClientInfo) {
+    this.checkListenerHasAD()
+    if (!this.locked) {
+      this.checkUnsynchronizedListeners()
     }
   }
 
+  listenerLoggedOut() {
+    this.checkListenerHasAD()
+  }
+
+  /*
+    Checks
+  */
+  checkTrackLoaded() {
+    if (this.socketServer.getListeners().every((info) => info.trackUri === this.trackUri))
+      this.trackLoaded()
+  }
+
+  checkListenerHasAD() {
+    this.lock(this.socketServer.getListeners().some((info) => Player.isTrackAd(info.trackUri)))
+  }
+
+  checkUnsynchronizedListeners() {
+    if (this.loadingTrack === null) {
+      if (this.socketServer.getListeners().some((info) => info.trackUri !== this.trackUri))
+        this.changeSong(this.trackUri)
+      // TODO: do the same with track progress
+    }
+  }
+
+  ///////////
+
+  trackLoaded() {
+    if (this.loadingTrack)
+      clearTimeout(this.loadingTrack)
+    this.loadingTrack = null
+
+    setTimeout(() => {
+      this.requestUpdateSong(undefined, false, 0)
+    }, 1000)
+  }
+
+  lock(lock: boolean) {
+    console.log("LOCKING: " + lock)
+    if (this.locked != lock) {
+      this.locked = lock
+      if (this.locked) {
+        this.updateSong(true, 0)
+      } else {
+        this.changeSong(this.socketServer.getHost()?.trackUri || this.trackUri)
+      }
+    }
+  }
+  
   onRequestSongInfo(info: ClientInfo) {
     info.socket.emit("songInfo", this.songInfo)
   }
 
   onNoListeners() {
-    this.currentTrackUri = ""
+    this.trackUri = ""
     this.paused = true
+    this.milliseconds = 0
     this.updateSongInfo("", "")
   }
   

@@ -15,6 +15,10 @@ export default class SocketServer {
     return [...this.clientsInfo.values()].filter((info: ClientInfo) => info.loggedIn)
   }
 
+  getHost(): ClientInfo | null {
+    return [...this.clientsInfo.values()].find((info) => info.isHost) || null
+  }
+
   emitToNonListeners(ev: string, ...args: any) {
     [...this.clientsInfo.values()].filter((info: ClientInfo) => !info.loggedIn).forEach(info => {
       info.socket.emit(ev, ...args)
@@ -66,7 +70,8 @@ export default class SocketServer {
         if (this.clientVersionValidator.validate(clientVersion)) {
           info.name = name
           info.loggedIn = true;
-          this.emitToNonListeners("listeners", this.getListeners().map(info => info.name))
+          this.player?.listenerLoggedIn(info)
+          this.io.emit("listeners", this.getListeners().map(info => info.name))
         } else {
           if (badVersion != null)
             badVersion(config.clientVersionRequirements)
@@ -77,11 +82,6 @@ export default class SocketServer {
         }
       })
 
-      socket.on("watchingAD", (watcingAD: boolean) => {
-        info.watchingAD = watcingAD;
-        this.player.checkADs();
-      })
-    
       socket.on("requestHost", (password: string) => {
         if (password === config.hostPassword) {
           if ([...this.clientsInfo.values()].every((info: ClientInfo) => !info.loggedIn || !info.isHost)) {
@@ -102,21 +102,9 @@ export default class SocketServer {
         info.isHost = false
         socket.emit("isHost", false)
       })
-    
-      socket.on("getListeners", (sendClients: (clients: string[]) => void) => {
-        sendClients(this.getListeners().map((info: ClientInfo) => info.name))
-      })
-    
-      socket.on("requestSyncSong", () => {
-        this.player?.onRequestSyncSong(info)
-      })
 
       socket.on("requestUpdateSong", (pause: boolean, milliseconds: number) => {
-        this.player?.onRequestUpdateSong(info, pause, milliseconds)
-      })
-  
-      socket.on("requestChangeSong", (trackUri: string) => {
-        this.player?.onRequestChangeSong(info, trackUri)
+        this.player?.requestUpdateSong(info, pause, milliseconds)
       })
   
       socket.on("requestSongInfo", () => {
@@ -124,7 +112,7 @@ export default class SocketServer {
       })
 
       socket.on("changedSong", (trackUri: string, songName?: string, songImage?: string) => {
-        this.player?.onClientChangedSong(info, trackUri, songName, songImage)
+        this.player?.listenerChangedSong(info, trackUri, songName, songImage)
       })
 
       socket.on("requestListeners", () => {
@@ -133,7 +121,8 @@ export default class SocketServer {
 
       socket.on("disconnecting", (reason) => {
         this.clientsInfo.delete(socket.id)
-        this.emitToNonListeners("listeners", this.getListeners().map(info => info.name))
+        this.player?.listenerLoggedOut()
+        this.io.emit("listeners", this.getListeners().map(info => info.name))
         if (this.getListeners().length === 0) {
           this.player?.onNoListeners()
         }

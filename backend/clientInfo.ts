@@ -5,8 +5,7 @@ export default class ClientInfo {
   public name = "Unnamed"
   public isHost = false
   public loggedIn = false
-  public watchingAD = false
-  public currentTrackUri = ""
+  public trackUri = ""
 
   constructor(public socket: Socket) {}
 }
