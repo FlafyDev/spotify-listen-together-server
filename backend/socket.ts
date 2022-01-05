@@ -43,6 +43,19 @@ export default class SocketServer {
     });
   }
 
+  sendListeners(socket?: Socket) {
+    if (!socket) 
+      socket = <any>this.io
+    let listeners = this.getListeners();
+    socket?.emit("listeners", this.getListeners().map(info => info.name), listeners.findIndex(info => info.isHost))
+  }
+
+  updateHost(info: ClientInfo, isHost: boolean) {
+    info.isHost = isHost
+    info.socket.emit("isHost", isHost)
+    this.sendListeners()
+  }
+
   addEvents(player: Player) {
     this.player = player
     this.io.on("connection", (socket: Socket) => {
@@ -55,7 +68,6 @@ export default class SocketServer {
           info.latency = Math.min((Date.now() - lastPing)/2, config.maxDelay)
         }
       });
-      
     
       socket.onAny((ev: string, ...args: any) => {
         console.log(`Receiving ${ev}(host=${info.isHost}): ${args}`)
@@ -71,7 +83,7 @@ export default class SocketServer {
           info.name = name
           info.loggedIn = true;
           this.player?.listenerLoggedIn(info)
-          this.io.emit("listeners", this.getListeners().map(info => info.name))
+          this.sendListeners()
         } else {
           if (badVersion != null)
             badVersion(config.clientVersionRequirements)
@@ -85,22 +97,18 @@ export default class SocketServer {
       socket.on("requestHost", (password: string) => {
         if (password === config.hostPassword) {
           if ([...this.clientsInfo.values()].every((info: ClientInfo) => !info.loggedIn || !info.isHost)) {
-            info.isHost = true
-            socket.emit("isHost", true)
+            this.updateHost(info, true)
           } else {
-            console.log("There is already an host")
-            socket.emit("showMessage", "There is already an host.", true)
+            socket.emit("bottomMessage", "There is already an host.")
           }
         } else {
-          info.isHost = false
-          socket.emit("isHost", false)
-          socket.emit("showMessage", "Incorrect password.", true)
+          this.updateHost(info, false)
+          socket.emit("bottomMessage", "Incorrect password.", true)
         }
       })
     
       socket.on("cancelHost", () => {
-        info.isHost = false
-        socket.emit("isHost", false)
+        this.updateHost(info, false)
       })
 
       socket.on("requestUpdateSong", (pause: boolean, milliseconds: number) => {
@@ -116,13 +124,17 @@ export default class SocketServer {
       })
 
       socket.on("requestListeners", () => {
-        socket.emit("listeners", this.getListeners().map(info => info.name))
+        this.sendListeners(socket)
+      })
+
+      socket.on("requestSong", (trackUri: string, trackName: string) => {
+        this.getHost()?.socket.emit("songRequested", trackUri, trackName, info.name)
       })
 
       socket.on("disconnecting", (reason) => {
         this.clientsInfo.delete(socket.id)
         this.player?.listenerLoggedOut()
-        this.io.emit("listeners", this.getListeners().map(info => info.name))
+        this.sendListeners()
         if (this.getListeners().length === 0) {
           this.player?.onNoListeners()
         }

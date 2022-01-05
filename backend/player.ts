@@ -44,7 +44,10 @@ export default class Player {
   }
 
   changeSong(trackUri: string) {
-    if (Player.isTrackListenable(trackUri) && this.loadingTrack === null) {
+    if (Player.isTrackListenable(trackUri)) {
+      if (this.loadingTrack !== null)
+        clearTimeout(this.loadingTrack)
+      
       this.milliseconds = 0
       this.trackUri = trackUri
       this.socketServer.emitToListeners("changeSong", trackUri)
@@ -61,7 +64,7 @@ export default class Player {
   requestUpdateSong(info: ClientInfo | undefined, pause: boolean, milliseconds: number) {
     if (info === undefined || info?.isHost) {
       if (this.locked) {
-        info?.socket.emit("showMessage", "Listen together is currently locked!", true)
+        info?.socket.emit("bottomMessage", "Listen together is currently locked!", true)
       } else {
         this.updateSong(pause, milliseconds)
       }
@@ -75,8 +78,8 @@ export default class Player {
     info.trackUri = newTrackUri
     if (info.isHost && info.trackUri !== this.trackUri) {
       if (this.locked) {
-        info.socket.emit("showMessage", "Listen together is currently locked!", true)
-      } else {
+        info.socket.emit("bottomMessage", "Listen together is currently locked!", true)
+      } else if (info.trackUri !== this.trackUri) {
         this.updateSongInfo(songName, songImage)
         this.changeSong(info.trackUri)
       }
@@ -86,7 +89,7 @@ export default class Player {
       if (this.loadingTrack !== null) {
         this.checkTrackLoaded()
       } else {
-        this.checkUnsynchronizedListeners()
+        this.checkDesynchronizedListeners()
       }
     }
   }
@@ -94,7 +97,7 @@ export default class Player {
   listenerLoggedIn(info: ClientInfo) {
     this.checkListenerHasAD()
     if (!this.locked) {
-      this.checkUnsynchronizedListeners()
+      this.checkDesynchronizedListeners()
     }
   }
 
@@ -114,9 +117,9 @@ export default class Player {
     this.lock(this.socketServer.getListeners().some((info) => Player.isTrackAd(info.trackUri)))
   }
 
-  checkUnsynchronizedListeners() {
+  checkDesynchronizedListeners() {
     if (this.loadingTrack === null) {
-      if (this.socketServer.getListeners().some((info) => info.trackUri !== this.trackUri))
+      if (this.socketServer.getListeners().some((info) => info.trackUri !== this.trackUri && !(info.isHost && info.trackUri == "")))
         this.changeSong(this.trackUri)
       // TODO: do the same with track progress
     }
