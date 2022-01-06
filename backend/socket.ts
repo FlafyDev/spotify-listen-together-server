@@ -46,8 +46,12 @@ export default class SocketServer {
   sendListeners(socket?: Socket) {
     if (!socket) 
       socket = <any>this.io
-    let listeners = this.getListeners();
-    socket?.emit("listeners", this.getListeners().map(info => info.name), listeners.findIndex(info => info.isHost))
+
+    socket?.emit("listeners", this.getListeners().map(info => {return {
+      name: info.name,
+      isHost: info.isHost,
+      watchingAD: info.trackUri.includes("spotify:ad:")
+    }}))
   }
 
   updateHost(info: ClientInfo, isHost: boolean) {

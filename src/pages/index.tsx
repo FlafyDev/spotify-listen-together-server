@@ -12,12 +12,12 @@ import styles from '../styles/Index.module.css'
 const Index: NextPage = () => {
   const router = useRouter();
   const [songInfo, setSongInfo] = useState<SongInfo | undefined>(undefined)
-  const [clients, setClients] = useState<string[]>([])
+  const [clients, setClients] = useState<any>([])
   
   useEffect(() => {
     const socket = io()
     socket.on("songInfo", (songInfo: SongInfo) => setSongInfo(songInfo))
-    socket.on("listeners", (clients: string[]) => setClients(clients))
+    socket.on("listeners", (clients: any) => setClients(clients))
     socket.on("connect", () => {
       console.log("connected!")
       socket.emit("requestSongInfo")
@@ -35,7 +35,7 @@ const Index: NextPage = () => {
       <br/><br/><br/>
       <div className={styles.header}>Who&apos;s listening?</div>
       <br/>
-      <ClientList clients={clients}></ClientList>
+      <ClientList listeners={clients}></ClientList>
       <br/><br/><br/>
       <Link href="/instructions">
         <button className={styles.button} onClick={() => Router}>Listen with them!</button>
