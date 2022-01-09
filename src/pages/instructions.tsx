@@ -54,14 +54,20 @@ const Instructions: NextPage = () => {
         <br/>
         <div className={styles.text+" "+styles.left+" "+styles.instructionsContainer}>
           <div>
-            1. Listen Together &gt; Join a server<br/>
+            1. Open Listen Together's menu by pressing the button on the top left.<br/>
             <img src="images/Instruction1.png"></img><br/><br/>
           </div>
           <div>
-            2. Enter the URL<br/>
+            2. Select "Join a server"<br/>
+              <img src="images/Instruction2.png"></img><br/><br/>
+          </div>
+          <div>
+            3. Enter the URL and your name<br/>
             <div className={styles.instruction2Container}>
-              <img src="/images/Instruction2.png"></img>
-              <input className={styles.textbox} value={typeof location !== 'undefined' ? location.protocol + '//' + location.host : ""} type="text" readOnly={true}/>
+              <img src="/images/Instruction3.png"></img>
+              <span className={styles.urlValue}>
+                {typeof location !== 'undefined' ? location.protocol + '//' + location.host : ""}
+              </span>
             </div>
           </div>
         </div>

@@ -1,4 +1,3 @@
-import { Socket } from "socket.io"
 import ClientInfo from "./clientInfo"
 import config from '../config'
 import SocketServer from "./socket"
@@ -12,6 +11,7 @@ export default class Player {
   public locked = false
   public millisecondsLastUpdate = Date.now()
   public songInfo = new SongInfo()
+  public loadAtMilliseconds = 0;
   
   constructor(public socketServer: SocketServer) { }
 
@@ -38,6 +38,7 @@ export default class Player {
       this.millisecondsLastUpdate = Date.now()
       this.socketServer.emitToListeners("updateSong", this.paused, milliseconds)
       this.updateSongInfo()
+      this.loadAtMilliseconds = 0;
       return true
     }
     return false
@@ -74,15 +75,23 @@ export default class Player {
   /*
     Updates
   */
-  listenerChangedSong(info: ClientInfo, newTrackUri: string, songName?: string, songImage?: string) {
-    info.trackUri = newTrackUri
-    if (info.isHost && info.trackUri !== this.trackUri) {
+  listenerLoadingSong(info: ClientInfo, newTrackUri: string) {
+    if (info.isHost && newTrackUri !== this.trackUri) {
       if (this.locked) {
         info.socket.emit("bottomMessage", "Listen together is currently locked!", true)
-      } else if (info.trackUri !== this.trackUri) {
-        this.updateSongInfo(songName, songImage)
-        this.changeSong(info.trackUri)
+      } else {
+        this.changeSong(newTrackUri)
       }
+    }
+  }
+
+  listenerChangedSong(info: ClientInfo, newTrackUri: string, songName?: string, songImage?: string) {
+    if (newTrackUri === "") {
+      return;
+    }
+    info.trackUri = newTrackUri
+    if (info.isHost) {
+      this.updateSongInfo(songName, songImage)
     }
     this.checkListenerHasAD()
     if (!this.locked) {
@@ -109,19 +118,24 @@ export default class Player {
     Checks
   */
   checkTrackLoaded() {
-    if (this.socketServer.getListeners().every((info) => info.trackUri === this.trackUri))
+    if (this.socketServer.getListeners().every((info) => info.trackUri === this.trackUri)) {
+      console.log(this.loadAtMilliseconds)
       this.trackLoaded()
+    }
   }
 
   checkListenerHasAD() {
-    this.lock(this.socketServer.getListeners().some((info) => Player.isTrackAd(info.trackUri)))
+    let hasAD = this.socketServer.getListeners().some((info) => Player.isTrackAd(info.trackUri))
+    this.lock(hasAD)
   }
 
   checkDesynchronizedListeners() {
     if (this.loadingTrack === null) {
-      if (this.socketServer.getListeners().some((info) => info.trackUri !== this.trackUri && !(info.isHost && info.trackUri == "")))
+      if (this.socketServer.getListeners().some((info) => info.trackUri !== this.trackUri)) {
+        console.trace()
+        this.loadAtMilliseconds = this.getTrackProgress()
         this.changeSong(this.trackUri)
-      // TODO: do the same with track progress
+      }
     }
   }
 
@@ -132,8 +146,11 @@ export default class Player {
       clearTimeout(this.loadingTrack)
     this.loadingTrack = null
 
+    let milliseconds = this.loadAtMilliseconds
+    this.loadAtMilliseconds = 0
     setTimeout(() => {
-      this.requestUpdateSong(undefined, false, 0)
+      console.log(`====== ${milliseconds}  ${this.trackUri}`)
+      this.requestUpdateSong(undefined, false, milliseconds)
     }, 1000)
   }
 
@@ -142,10 +159,11 @@ export default class Player {
     if (this.locked != lock) {
       this.locked = lock
       if (this.locked) {
-        this.updateSong(true, 0)
+        // this.updateSong(true, 0)
       } else {
         this.changeSong(this.socketServer.getHost()?.trackUri || this.trackUri)
       }
+      this.socketServer.sendListeners()
     }
   }
   

@@ -123,6 +123,10 @@ export default class SocketServer {
         this.player?.onRequestSongInfo(info)
       })
 
+      socket.on("loadingSong", (trackUri: string) => {
+        this.player?.listenerLoadingSong(info, trackUri)
+      })
+
       socket.on("changedSong", (trackUri: string, songName?: string, songImage?: string) => {
         this.player?.listenerChangedSong(info, trackUri, songName, songImage)
       })
