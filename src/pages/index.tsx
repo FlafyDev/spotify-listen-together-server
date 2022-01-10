@@ -37,7 +37,7 @@ const Index: NextPage = () => {
       <br/>
       <ClientList listeners={clients}></ClientList>
       <br/><br/><br/>
-      <Link href="/instructions">
+      <Link href="/instructions" passHref>
         <button className={styles.button} onClick={() => Router}>Listen with them!</button>
       </Link>
       <br/><br/><br/>
