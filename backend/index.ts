@@ -23,10 +23,12 @@ app.prepare().then(() => {
   })
 
   // Sorry I don't know another way
-  let publicFolder = path.join(__dirname, '/public')
+  let publicFolder = __dirname
   let distPos = publicFolder.lastIndexOf("dist");
   if (distPos != -1)
-    publicFolder = publicFolder.substring(0, distPos) + publicFolder.substring(distPos+4, publicFolder.length);
+    publicFolder = path.join(publicFolder.substring(0, distPos), '/public/');
+
+  console.log(publicFolder)
 
   server.use(express.static(publicFolder))
 

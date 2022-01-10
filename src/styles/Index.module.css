@@ -16,6 +16,7 @@
   display: flex;
   align-items: center;
   flex-direction: column;
+  min-height: 70vh;
 }
 
 .button {
@@ -28,8 +29,17 @@
   cursor: pointer;
 }
 
+.subButton {
+  background-color: #c84cc8;
+  font-size: 20px;
+}
+
 .button:active {
   background-color: #14a748;
+}
+
+.subButton:active {
+  background-color: #a53ea5;
 }
 
 .code {
@@ -79,4 +89,16 @@
     height: 12px;
     width: 142px;
   }
+}
+
+.footer {
+  background-color: #1f1919;
+  height: 10vh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.footer > * {
+  padding: 0 10px;
 }

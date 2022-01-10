@@ -55,16 +55,16 @@ const Instructions: NextPage = () => {
         <div className={styles.text+" "+styles.left+" "+styles.instructionsContainer}>
           <div>
             {"1. Open Listen Together's menu by pressing the button on the top left."}<br/>
-            <Image src="images/Instruction1.png"></Image><br/><br/>
+            <img src="images/Instruction1.png"></img><br/><br/>
           </div>
           <div>
             {"2. Select \"Join a server\""}<br/>
-              <Image src="images/Instruction2.png"></Image><br/><br/>
+              <img src="images/Instruction2.png"></img><br/><br/>
           </div>
           <div>
             {"3. Enter the URL and your name"}<br/>
             <div className={styles.instruction2Container}>
-              <Image src="/images/Instruction3.png"></Image>
+              <img src="/images/Instruction3.png"></img>
               <span className={styles.urlValue}>
                 {typeof location !== 'undefined' ? location.protocol + '//' + location.host : ""}
               </span>

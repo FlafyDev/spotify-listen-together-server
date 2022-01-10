@@ -4,6 +4,7 @@ import { Router, useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { io } from 'socket.io-client'
 import SongInfo from '../../backend/web-shared/songInfo'
+import config from '../../config'
 import ClientList from '../components/clientList'
 import Header from '../components/header'
 import Song from '../components/song'
@@ -37,10 +38,21 @@ const Index: NextPage = () => {
       <br/>
       <ClientList listeners={clients}></ClientList>
       <br/><br/><br/>
+      <button className={styles.button} onClick={() => {
+        window.open(`spotify:listentogether:${encodeURIComponent(typeof location !== 'undefined' ? location.protocol + '//' + location.host : "")}`, '_self')
+      }}>Listen with them!</button>
+      <br/>
       <Link href="/instructions" passHref>
-        <button className={styles.button} onClick={() => Router}>Listen with them!</button>
+        <button className={styles.button + " " + styles.subButton}>Download</button>
       </Link>
       <br/><br/><br/>
+    </div>
+    <div className={styles.footer}>
+      <a href='https://github.com/FlafyDev/spotify-listen-together'>
+        <img src='/images/Github.png' width={64}></img>
+      </a>
+      <label>Made by <a href='https://github.com/FlafyDev'>FlafyDev</a></label>
+      <label>Recommended client v{config.clientRecommendedVersion}</label>
     </div>
   </div>
 }

@@ -8,7 +8,8 @@
     "build:server": "tsc --project tsconfig.server.json",
     "build:next": "next build",
     "build": "yarn run build:next && yarn run build:server",
-    "postinstall": "yarn run build"
+    "postinstall": "yarn run build",
+    "web-only": "next dev"
   },
   "dependencies": {
     "express": "^4.17.2",
