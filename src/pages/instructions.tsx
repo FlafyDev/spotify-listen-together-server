@@ -6,10 +6,9 @@ import stylesInst from '../styles/Instructions.module.css'
 import spotStyles from '../styles/Spot.module.css'
 
 const Instructions: NextPage = () => {
-  const releaseURL = `https://github.com/FlafyDev/spotify-listen-together/releases/download/v${config.clientRecommendedVersion}`
-  const listenTogetherURL = `${releaseURL}/listenTogether.js`
-  const windowsInstallURL = `${releaseURL}/windows-listen-together-install.ps1`
-  const windowsInstallCMD = `Invoke-WebRequest -UseBasicParsing "${windowsInstallURL}" | Invoke-Expression`
+  const repoURL = `https://raw.githubusercontent.com/FlafyDev/spotify-listen-together/${config.clientRecommendedVersion}`
+  const listenTogetherURL = `${repoURL}/compiled/listenTogether.js`
+  const windowsInstallCMD = `Invoke-WebRequest -UseBasicParsing "https://raw.githubusercontent.com/CharlieS1103/spicetify-marketplace/master/install.ps1" | Invoke-Expression`
 
   return (
     <div className="main">
@@ -17,7 +16,7 @@ const Instructions: NextPage = () => {
         <br />
         <div className={styles.header}>Install Spotify Listen Together</div>
         <br /><br />
-        <div className={styles.header+" "+styles.left}>Automatic Windows install</div>
+        <div className={styles.header+" "+styles.left}>Automatic Windows install for Spotify Marketplace</div>
         <br />
         <div className={styles.text+" "+styles.left}>
           1. Press WIN + R<br/>
